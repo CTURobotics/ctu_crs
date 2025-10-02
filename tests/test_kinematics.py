@@ -11,7 +11,6 @@ import unittest
 
 
 class TestKinematics(unittest.TestCase):
-
     def test_fk_zeros(self):
         r = CRS93(tty_dev=None)
         pose = r.fk([0, 0, 0, 0, 0, 0])
