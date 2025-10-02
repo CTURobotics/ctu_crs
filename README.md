@@ -69,3 +69,13 @@ If the motor enters an error state (indicated by a flashing green status LED abo
 robot.reset_motors()
 ```
 Note: Re-homing the robot is not necessary, even after activating the emergency stop or opening the cage door, as long as the control unit is not powered off.
+
+
+## For developers
+```
+git clone git@github.com:CTURobotics/ctu_crs.git
+cd ctu_crs
+uv sync
+uv pip install -e ".[dev]"
+pre-commit install
+```
