@@ -26,8 +26,6 @@ class CRSRobot:
         )
 
         self.link_lengths = np.array([0.3052, 0.3048, 0.3302, 0.0762])
-        self.gripper_length = 0.108712
-        self.finger_length = 0.0254
 
         # conversion IRC to radians
         irc = np.array([1000, 1000, 1000, 500, 500, 500])  # IRC per rotation of motor.
@@ -86,7 +84,7 @@ class CRSRobot:
             0,
             self.link_lengths[2],
             0,
-            self.link_lengths[3] + self.gripper_length + self.finger_length,
+            self.link_lengths[3],
         ]
         self.dh_a = [0, self.link_lengths[1], 0, 0, 0, 0]
         self.dh_alpha = np.deg2rad(np.array([90.0, 0.0, 270.0, 90.0, 270.0, 0]))
@@ -252,7 +250,7 @@ class CRSRobot:
 
     def fk(self, q: ArrayLike) -> np.ndarray:
         """Compute forward kinematics for the given joint configuration @param q.
-        Returns 4x4 homogeneous transformation matrix (SE3) of the end-effector w.r.t.
+        Returns 4x4 homogeneous transformation matrix (SE3) of the flange w.r.t.
         base of the robot."""
         pose = np.eye(4)
         for d, a, alpha, theta, qi in zip(
@@ -325,7 +323,10 @@ class CRSRobot:
 
     def ik(self, pose: np.ndarray) -> list[np.ndarray]:
         """Compute inverse kinematics for the given pose. Returns array of joint
-        configurations [rad] which can achieve the given pose."""
+        configurations [rad] which can achieve the given pose.
+        Args:
+            pose: 4x4 homogeneous transformation matrix (SE3) of the flange with respect to the base of the robot.
+        """
 
         # X=A01*A12*A23 * [0 0 0 1]' because A34*A45*A57==R34*R45*R56 is pure rotation
         flange_pos = pose @ np.array([0, 0, -self.dh_d[5], 1])
