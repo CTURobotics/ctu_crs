@@ -18,10 +18,15 @@ Example:
   # Move joint q0 by 10 degrees and joint q1 by -5 degrees
   move_crs93 q0 10 q1 -5
 
-  # Move joint q2 by 20.5 degrees
-  move_crs93 q2 20.5
+  # Move joint q2 by 20.5 degrees without homing the robot first
+  move_crs93 --nohome q2 20.5
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--nohome",
+        action="store_true",
+        help="Initialize the robot without performing the homing sequence.",
     )
     parser.add_argument(
         "joint_value_pairs",
@@ -54,9 +59,10 @@ angles in degrees. Each joint name must be followed by its angle.""",
             return
 
     robot = CRS93()
-    robot.initialize()
+    robot.initialize(home=not args.nohome)
 
-    q_target = robot.get_q().copy()
+    q_current = robot.get_q()
+    q_target = q_current.copy()
 
     for joint_index, angle_deg in joint_offsets.items():
         if 0 <= joint_index < len(q_target):
