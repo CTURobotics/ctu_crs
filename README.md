@@ -76,7 +76,7 @@ Run the following command to release the robot:
 robot.release()
 ```
 This will engage the brakes and disconnect feedback. Be cautious, as the robot arm might slightly drop, so avoid performing this command directly above the work surface.
-Open the cage door (the yellow Arm Power LED will turn off).π
+Open the cage door (the yellow Arm Power LED will turn off).
 
 ## Emergency Stop Procedure
 If the robot behaves unexpectedly, immediately press the Emergency Stop button (red mushroom-shaped button).
