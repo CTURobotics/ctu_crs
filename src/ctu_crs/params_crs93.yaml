@@ -8,3 +8,5 @@ default_speed_irc256_per_ms: [ 7680, 2048, 5120, 7680, 7680, 19200 ]
 default_acceleration_irc_per_ms: [ 51, 10, 20, 38, 128, 768 ]
 
 gripper: { bounds: [ 840, 103 ], axis: G }
+
+camera_name: "camera-crs93"

@@ -12,6 +12,7 @@ from numpy.typing import ArrayLike
 from ctu_mars_control_unit import MarsControlUnit
 
 from ctu_crs.gripper import Gripper
+from ctu_crs.basler_camera import BaslerCamera
 
 
 class CRSRobot:
@@ -93,6 +94,17 @@ class CRSRobot:
 
         self._initialized = False
 
+        self._camera: BaslerCamera | None = None
+        self._camera_name: str = crs_kwargs["camera_name"]
+
+    def grab_image(self, timeout=10000):
+        if self._camera is None:
+            self._camera = BaslerCamera()
+            self._camera.connect_by_name(self._camera_name)
+            self._camera.open()
+            self._camera.set_parameters()
+        return self._camera.grab_image(timeout)
+
     def release(self):
         """Release errors and reset control unit."""
         self._mars.send_cmd("RELEASE:\n")
@@ -108,7 +120,7 @@ class CRSRobot:
     def initialize(self, home: bool = True):
         """Initialize communication with robot and set all necessary parameters.
         This command will perform following settings:
-         - synchronize communication with mars control unit
+         - synchronize communication with mars control unitπ
          - reset motors and wait for them to be ready
          - set PID control parameters, maximum speed and acceleration
          - set value for IDLE release
