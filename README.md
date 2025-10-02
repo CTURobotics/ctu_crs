@@ -10,20 +10,35 @@ pip install ctu_crs
 ## Command-Line Scripts
 
 This package includes command-line scripts for direct robot control from your terminal.
-After installing the package, you can use the `move_crs97` or `move_crs93` script to move the robot by a relative offset for specified joints.
+
+### `move_crs93` and `move_crs97`
+
+After installing the package, you can use the `move_crs93` or `move_crs97` scripts to move the robot by a relative offset for specified joints.
 
 **Usage:**
 
 ```sh
-move_crs93 <joint_name> <angle_degrees> [<joint_name> <angle_degrees> ...]
-move_crs97 <joint_name> <angle_degrees> [<joint_name> <angle_degrees> ...]
+move_crs93 [--nohome] <joint> <angle> [<joint> <angle> ...]
+move_crs97 [--nohome] <joint> <angle> [<joint> <angle> ...]
 ```
 
-To move the first joint (`q0`) by 10 degrees and the second joint (`q1`) by -5 degrees, run:
+**Arguments:**
+
+*   `<joint> <angle>`: One or more pairs of joint names (q0-q5) and their corresponding relative angles in degrees.
+*   `--nohome`: Optional flag to initialize the robot without performing the homing sequence.
+
+**Examples:**
+
+To move the `crs93`'s first joint (`q0`) by 10 degrees and the second joint (`q1`) by -5 degrees:
 
 ```sh
 move_crs93 q0 10 q1 -5
-move_crs97 q0 10 q1 -5
+```
+
+To move the `crs97`'s second joint (`q2`) by 20.5 degrees without homing the robot first:
+
+```sh
+move_crs97 --nohome q2 20.5
 ```
 
 ## Simple python script to control the robot
