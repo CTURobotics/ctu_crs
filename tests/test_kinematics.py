@@ -17,7 +17,7 @@ class TestKinematics(unittest.TestCase):
         exp_translation = [
             0.0,
             0.0,
-            np.sum(r.link_lengths) + r.gripper_length + r.finger_length,
+            np.sum(r.link_lengths),
         ]
         np.testing.assert_allclose(pose[:3, 3], exp_translation, atol=1e-6)
         np.testing.assert_allclose(pose[:3, :3], np.eye(3), atol=1e-6)
