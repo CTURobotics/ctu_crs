@@ -12,10 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: ".python-version"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v1
 
       - name: Install dependencies
         run: uv sync
@@ -27,4 +25,4 @@ jobs:
         run: uv run pytest tests
 
       - name: Run format check
-        run: uvx pre-commit run --all-file
+        run: uvx pre-commit run --all-files
