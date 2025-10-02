@@ -10,9 +10,6 @@ pip install ctu_crs
 ## Command-Line Scripts
 
 This package includes command-line scripts for direct robot control from your terminal.
-
-### `move_crs97`
-
 After installing the package, you can use the `move_crs97` or `move_crs93` script to move the robot by a relative offset for specified joints.
 
 **Usage:**
