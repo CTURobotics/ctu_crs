@@ -13,6 +13,6 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
       - name: Build distributions
-        run: uv dist build -o dist/
+        run: uv build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

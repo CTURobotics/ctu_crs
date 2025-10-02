@@ -1,6 +1,6 @@
 [project]
 name = "ctu_crs"
-version = "1.0.3"
+version = "1.0.4"
 description = "Package to control CTU/CIIRC robots CRS93 and CRS97 via MARS control unit."
 authors = [
     {name = "Vladimir Petrik", email = "vladimir.petrik@cvut.cz"},
@@ -14,6 +14,9 @@ requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "BSD 3-Clause"}
 
+[project.scripts]
+move_crs93 = "ctu_crs.scripts.move_crs93:main"
+move_crs97 = "ctu_crs.scripts.move_crs97:main"
 
 [project.optional-dependencies]
 dev = [

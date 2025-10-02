@@ -7,6 +7,28 @@ Package to control CTU/CIIRC robots CRS93 and CRS97 via MARS control unit.
 pip install ctu_crs
 ```
 
+## Command-Line Scripts
+
+This package includes command-line scripts for direct robot control from your terminal.
+
+### `move_crs97`
+
+After installing the package, you can use the `move_crs97` or `move_crs93` script to move the robot by a relative offset for specified joints.
+
+**Usage:**
+
+```sh
+move_crs93 <joint_name> <angle_degrees> [<joint_name> <angle_degrees> ...]
+move_crs97 <joint_name> <angle_degrees> [<joint_name> <angle_degrees> ...]
+```
+
+To move the first joint (`q0`) by 10 degrees and the second joint (`q1`) by -5 degrees, run:
+
+```sh
+move_crs93 q0 10 q1 -5
+move_crs97 q0 10 q1 -5
+```
+
 ## Simple python script to control the robot
 
 ```python
