@@ -54,6 +54,30 @@ robot.wait_for_motion_stop() # wait until the robot stops
 robot.close()  # close the connection
 ```
 
+## Example of Grabbing a Camera Picture
+
+You can easily capture an image from the camera associated with the robot using the robot interface itself. The library handles the camera connection automatically.
+
+```python
+from ctu_crs import CRS97 # or CRS93
+
+# Initialize the robot interface
+robot = CRS97()
+robot.initialize()
+
+# Grab an image from the camera
+# This will automatically connect to and open the camera on the first call
+img = robot.grab_image()
+
+# 'img' is a NumPy array containing the image data.
+# You can now process it, for example, using a library like OpenCV.
+if img is not None:
+    print(f"Successfully grabbed image with shape: {img.shape}")
+
+# Don't forget to close the connection when you're done
+robot.close()
+```
+
 ## Step-by-Step Procedure for Operating the Robot
 
 - **Power On the Robot**
