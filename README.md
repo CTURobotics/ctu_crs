@@ -1,5 +1,6 @@
 # CRS robots control at CTU/CIIRC
 Package to control CTU/CIIRC robots CRS93 and CRS97 via MARS control unit.
+For the complete documentation see https://robotics-robot-stations.readthedocs.io/
 
 ## Installation
 
