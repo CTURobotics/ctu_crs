@@ -8,6 +8,7 @@
 from ctu_crs.crs93 import CRS93
 import numpy as np
 import unittest
+import warnings
 
 
 class TestKinematics(unittest.TestCase):
@@ -61,6 +62,60 @@ class TestKinematics(unittest.TestCase):
             for s in sols:
                 q[:3] = s
                 np.testing.assert_allclose(r.fk_flange_pos(q), flange_pos, atol=1e-6)
+
+    def test_ik_xyz_flange_unreachable(self):
+        """Targets beyond the reach or too close to the shoulder: no solution."""
+        np.random.seed(0)
+        r = CRS93(tty_dev=None)
+        reach = r.dh_a[1] + r.dh_d[3]
+        dead_zone = np.abs(r.dh_a[1] - r.dh_d[3])
+        shoulder = np.array([0, 0, r.dh_d[0]])
+        for _ in range(100):
+            u = np.random.normal(size=3)
+            u /= np.linalg.norm(u)
+            for c in (np.random.uniform(0, dead_zone), reach + 1e-4):
+                with warnings.catch_warnings():
+                    warnings.simplefilter("error")  # no NaN from arccos
+                    sols = r._ik_flange_pos(shoulder + c * u)
+                self.assertEqual(len(sols), 0)
+
+    def test_ik_xyz_flange_fold_boundary(self):
+        """Targets exactly at the fold-in distance |d3 - a1| from the shoulder are
+        reachable; roundoff in the distance must not reject them or produce NaN."""
+        np.random.seed(0)
+        r = CRS93(tty_dev=None)
+        shoulder = np.array([0, 0, r.dh_d[0]])
+        min_c = np.abs(r.dh_a[1] - r.dh_d[3])
+        for _ in range(100):
+            u = np.random.normal(size=3)
+            u /= np.linalg.norm(u)
+            flange_pos = shoulder + min_c * u
+            with warnings.catch_warnings():
+                warnings.simplefilter("error")
+                sols = r._ik_flange_pos(flange_pos)
+            self.assertEqual(len(sols), 4)
+            for s in sols:
+                q = np.zeros(6)
+                q[:3] = s
+                np.testing.assert_allclose(r.fk_flange_pos(q), flange_pos, atol=1e-6)
+
+    def test_ik_xyz_flange_straight_up(self):
+        """Targets straight above the shoulder, including those lower than the
+        shoulder height, have the folded solutions; at or below it there are none."""
+        r = CRS93(tty_dev=None)
+        shoulder = np.array([0, 0, r.dh_d[0]])
+        min_b = np.abs(r.dh_a[1] - r.dh_d[3])
+        max_b = r.dh_a[1] + r.dh_d[3]
+        for b in np.linspace(min_b + 1e-3, max_b - 1e-3, 20):
+            flange_pos = shoulder + np.array([0, 0, b])
+            sols = r._ik_flange_pos(flange_pos)
+            self.assertEqual(len(sols), 2)
+            for s in sols:
+                q = np.zeros(6)
+                q[:3] = s
+                np.testing.assert_allclose(r.fk_flange_pos(q), flange_pos, atol=1e-6)
+        for b in (0.0, -0.1):
+            self.assertEqual(len(r._ik_flange_pos(shoulder + np.array([0, 0, b]))), 0)
 
     def test_ik(self):
         np.random.seed(0)
