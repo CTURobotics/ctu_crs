@@ -319,22 +319,14 @@ class CRSRobot:
         cos_a = np.clip((a[1] ** 2 + c**2 - d[3] ** 2) / (2 * a[1] * c), -1, 1)
         cos_b = np.clip((a[1] ** 2 + d[3] ** 2 - c**2) / (2 * a[1] * d[3]), -1, 1)
 
-        theta2_base = (
-            np.pi / 2
-            - np.arcsin(b / c)
-            + np.arccos(cos_a)
-        )
+        theta2_base = np.pi / 2 - np.arcsin(b / c) + np.arccos(cos_a)
         th2_term1 = np.atan2(np.sin(theta2_base), np.cos(theta2_base))
 
         theta1_pos = np.arctan2(flange_pos[1], flange_pos[0])
         theta1_neg = np.arctan2(-flange_pos[1], -flange_pos[0])
         theta3_term1 = np.pi - np.arccos(cos_b)
 
-        th2_term2 = (
-            -np.pi / 2
-            + np.arcsin(b / c)
-            + np.arccos(cos_a)
-        )
+        th2_term2 = -np.pi / 2 + np.arcsin(b / c) + np.arccos(cos_a)
 
         return [
             np.array([theta1_pos, -th2_term1, theta3_term1]),
