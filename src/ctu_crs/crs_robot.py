@@ -278,13 +278,17 @@ class CRSRobot:
         robot configurations that are above the ground."""
         d = self.dh_d
         a = self.dh_a
+        # Joints 2 and 3 form a two-link arm (a[1], d[3]) about the shoulder at
+        # height d[0]; b is the target height relative to the shoulder.
         b = flange_pos[2] - d[0]
 
         if allclose(flange_pos[:2], 0):  # last link pointing up
             max_b = d[3] + a[1]
             if allclose(b, max_b):  # full length
                 return [np.array([singularity_theta1, 0, 0])]
-            if b > d[0]:
+            # b is relative to the shoulder, so compare against 0, not d[0]
+            # (which wrongly rejected targets lower than 2*d[0]).
+            if b > 0:
                 arg1 = (a[1] ** 2 + b**2 - d[3] ** 2) / (2 * a[1] * b)
                 arg2 = (a[1] ** 2 + d[3] ** 2 - b**2) / (2 * a[1] * d[3])
                 if np.abs(arg1) > 1.0 or np.abs(arg2) > 1.0:
@@ -304,27 +308,32 @@ class CRSRobot:
                 np.array([np.arctan2(flange_pos[1], flange_pos[0]), tmp, 0]),
                 np.array([np.arctan2(-flange_pos[1], -flange_pos[0]), -tmp, 0]),
             ]
-        if c >= d[3] + a[1] or c < np.abs(d[3] - a[1]):
+        # Reachable shoulder distances are c in [|d[3] - a[1]|, d[3] + a[1]];
+        # below the lower bound the arccos arguments exceed 1 and give NaN.
+        min_c = np.abs(d[3] - a[1])
+        if c >= d[3] + a[1] or (c < min_c and not allclose(c, min_c)):
             # out of reach, or closer to the shoulder than the arm can fold
             return []
+        # Law of cosines: cos_a at the shoulder, cos_b at the elbow. Clipped
+        # because roundoff can push them past +-1 at the fold boundary c == min_c.
+        cos_a = np.clip((a[1] ** 2 + c**2 - d[3] ** 2) / (2 * a[1] * c), -1, 1)
+        cos_b = np.clip((a[1] ** 2 + d[3] ** 2 - c**2) / (2 * a[1] * d[3]), -1, 1)
 
         theta2_base = (
             np.pi / 2
             - np.arcsin(b / c)
-            + np.arccos((a[1] ** 2 + c**2 - d[3] ** 2) / (2 * a[1] * c))
+            + np.arccos(cos_a)
         )
         th2_term1 = np.atan2(np.sin(theta2_base), np.cos(theta2_base))
 
         theta1_pos = np.arctan2(flange_pos[1], flange_pos[0])
         theta1_neg = np.arctan2(-flange_pos[1], -flange_pos[0])
-        theta3_term1 = np.pi - np.arccos(
-            (a[1] ** 2 + d[3] ** 2 - c**2) / (2 * a[1] * d[3])
-        )
+        theta3_term1 = np.pi - np.arccos(cos_b)
 
         th2_term2 = (
             -np.pi / 2
             + np.arcsin(b / c)
-            + np.arccos((a[1] ** 2 + c**2 - d[3] ** 2) / (2 * a[1] * c))
+            + np.arccos(cos_a)
         )
 
         return [
