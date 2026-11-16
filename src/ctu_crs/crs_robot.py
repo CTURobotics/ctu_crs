@@ -304,7 +304,8 @@ class CRSRobot:
                 np.array([np.arctan2(flange_pos[1], flange_pos[0]), tmp, 0]),
                 np.array([np.arctan2(-flange_pos[1], -flange_pos[0]), -tmp, 0]),
             ]
-        if c >= d[3] + a[1]:
+        if c >= d[3] + a[1] or c < np.abs(d[3] - a[1]):
+            # out of reach, or closer to the shoulder than the arm can fold
             return []
 
         theta2_base = (

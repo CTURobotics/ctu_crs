@@ -8,6 +8,7 @@
 from ctu_crs.crs93 import CRS93
 import numpy as np
 import unittest
+import warnings
 
 
 class TestKinematics(unittest.TestCase):
@@ -61,6 +62,22 @@ class TestKinematics(unittest.TestCase):
             for s in sols:
                 q[:3] = s
                 np.testing.assert_allclose(r.fk_flange_pos(q), flange_pos, atol=1e-6)
+
+    def test_ik_xyz_flange_unreachable(self):
+        """Targets beyond the reach or too close to the shoulder: no solution."""
+        np.random.seed(0)
+        r = CRS93(tty_dev=None)
+        reach = r.dh_a[1] + r.dh_d[3]
+        dead_zone = np.abs(r.dh_a[1] - r.dh_d[3])
+        shoulder = np.array([0, 0, r.dh_d[0]])
+        for _ in range(100):
+            u = np.random.normal(size=3)
+            u /= np.linalg.norm(u)
+            for c in (np.random.uniform(0, dead_zone), reach + 1e-4):
+                with warnings.catch_warnings():
+                    warnings.simplefilter("error")  # no NaN from arccos
+                    sols = r._ik_flange_pos(shoulder + c * u)
+                self.assertEqual(len(sols), 0)
 
     def test_ik(self):
         np.random.seed(0)
